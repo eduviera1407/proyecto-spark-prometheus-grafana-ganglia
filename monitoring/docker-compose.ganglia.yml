@@ -1,0 +1,17 @@
+services:
+  ganglia:
+    build:
+      context: .
+    container_name: monitoring-ganglia
+    hostname: ganglia
+    ports:
+      - "8088:80"
+      - "8649:8649/tcp"
+      - "8649:8649/udp"
+    networks:
+      - red_de_spark
+
+networks:
+  red_de_spark:
+    external: true
+    name: spark-net

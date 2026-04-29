@@ -1,0 +1,22 @@
+groups:
+  - name: cpu-alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 * (1 - avg by(instance) (rate(node_cpu_seconds_total{job="node-exporter", mode="idle"}[1m]))) > 10
+        for: 5s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Uso de CPU alto en {{ $labels.instance }}"
+          description: "PRUEBA: la CPU ha superado el 10% durante más de 5 segundos."
+
+  - name: worker-alerts
+    rules:
+      - alert: WorkerDown
+        expr: up{job="spark-workers"} == 0
+        for: 10s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Worker caído: {{ $labels.instance }}"
+          description: "El worker {{ $labels.instance }} no responde desde hace más de 10 segundos."

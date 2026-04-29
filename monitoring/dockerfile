@@ -1,0 +1,22 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        apache2 \
+        libapache2-mod-php \
+        php-xml \
+        ganglia-monitor \
+        ganglia-webfrontend \
+        gmetad \
+    && ln -sf /etc/ganglia-webfrontend/apache.conf /etc/apache2/conf-available/ganglia-webfrontend.conf \
+    && a2enconf ganglia-webfrontend \
+    && mkdir -p /var/lib/ganglia/rrds /var/run/apache2 /var/lock/apache2 \
+    && chown -R ganglia:ganglia /var/lib/ganglia \
+    && chown -R nobody:nogroup /var/lib/ganglia/rrds \
+    && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 80 8649/tcp 8649/udp
+
+CMD ["sh", "-c", "mkdir -p /var/lib/ganglia/rrds /var/run/apache2 /var/lock/apache2 && chown -R ganglia:ganglia /var/lib/ganglia && chown -R nobody:nogroup /var/lib/ganglia/rrds && gmond --conf=/etc/ganglia/gmond.conf && gmetad --conf=/etc/ganglia/gmetad.conf && exec apachectl -D FOREGROUND"]

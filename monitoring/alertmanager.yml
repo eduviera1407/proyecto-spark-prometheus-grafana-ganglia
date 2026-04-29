@@ -1,0 +1,23 @@
+route:
+  receiver: discord-receiver
+  group_by: ['alertname', 'instance']
+  group_wait: 5s
+  group_interval: 10s
+  repeat_interval: 1h
+
+receivers:
+  - name: discord-receiver
+    discord_configs:
+      - webhook_url: "https://discord.com/api/webhooks/1498081495250899157/P1OCR8HG2ls7jttrIU7V6AUX2TjLJc4FnU2exeIjnIffdcYzIUZuWwebmraCwezlsYph"
+        send_resolved: true
+        username: "Alertmanager"
+        content: >
+          🚨 **Alerta recibida**
+          {{ range .Alerts }}
+          **{{ .Labels.alertname }}**
+          Instancia: `{{ .Labels.instance }}`
+          Severidad: `{{ .Labels.severity }}`
+          Resumen: {{ .Annotations.summary }}
+          Descripción: {{ .Annotations.description }}
+          Estado: `{{ .Status }}`
+          {{ end }}
